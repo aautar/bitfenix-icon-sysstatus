@@ -1,0 +1,8 @@
+[package]
+name = "bitfenix-icon-sysstatus"
+version = "0.1.0"
+authors = ["Avishkar Autar <aautar@digital-radiation.com>"]
+
+[dependencies]
+png = "0.15.3"
+hidapi = "1.1.0"
