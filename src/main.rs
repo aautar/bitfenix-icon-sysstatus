@@ -77,9 +77,9 @@ fn main() -> io::Result<()> {
 
     println!("Loading assets...");
 
-    // Image needs to be 240x320 RGB (no alpha channel)
+    // Image needs to be 240x320 (24bpp, no alpha channel)
     let src_image = load_png_image("assets/1.png");
-    let new_img = reduce_image_to_16bit_color(&src_image);
+    let reduced_color_img = reduce_image_to_16bit_color(&src_image);
 
     println!("Opening device...");
     let hid = HidApi::new().unwrap();
@@ -92,7 +92,7 @@ fn main() -> io::Result<()> {
 
     println!("Writing new image...");
     clear_display(&bitfenix_icon_device); // needs to be done or you end up with weird overwriting on top of exiting image
-    write_image_to_display(&bitfenix_icon_device, &new_img);
+    write_image_to_display(&bitfenix_icon_device, &reduced_color_img);
 
     println!("Refreshing display...");
     refresh_display(&bitfenix_icon_device);
