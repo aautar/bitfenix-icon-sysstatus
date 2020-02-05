@@ -1,20 +1,15 @@
 extern crate hidapi;
 
+mod text_renderer;
+mod image;
+
 use std::io::{self};
-use std::fs::File;
 use hidapi::HidApi;
 use hidapi::HidDevice;
-
-fn load_png_image(filepath: &str) -> Vec<u8> {
-    let decoder = png::Decoder::new(File::open(filepath).unwrap());
-    let (info, mut reader) = decoder.read_info().unwrap();
-    
-    // Allocate the output buffer.
-    let mut buf = vec![0; info.buffer_size()];
-    reader.next_frame(&mut buf).unwrap();
-
-    buf
-}
+use text_renderer::render_string;
+use text_renderer::load_font_png;
+use image::load_png_image;
+use image::reduce_image_to_16bit_color;
 
 fn print_device_info(bitfenix_icon_device: &HidDevice) {
     let device_manuf_string = bitfenix_icon_device.get_manufacturer_string().unwrap().unwrap();    
@@ -30,22 +25,6 @@ fn clear_display(bitfenix_icon_device: &HidDevice) {
 fn refresh_display(bitfenix_icon_device: &HidDevice) {
     let refresh_code: [u8; 2] = [0x0, 0x3];
     bitfenix_icon_device.write(&refresh_code).unwrap();        
-}
-
-fn reduce_image_to_16bit_color(image_buf: &[u8]) -> Vec<u8> {
-    let mut result: Vec<u8> = Vec::with_capacity(240 * 320 * 2);
-
-    for i in (0..image_buf.len()).step_by(3) {
-		let b: u16 = ((image_buf[i + 2] as u16) >> 3) & 0x001F;
-		let g: u16 = (((image_buf[i + 1] as u16) >> 2) <<  5) & 0x07E0;
-		let r: u16 = (((image_buf[i] as u16) >> 3) << 11) & 0xF800;
-        let rgb: u16 = r | g | b;
-        
-        result.push( ((rgb >> 8) & 0x00FF) as u8 );
-        result.push( (rgb & 0x00FF) as u8 );
-    }
-
-    result
 }
 
 fn write_image_to_display(bitfenix_icon_device: &HidDevice, image_buf: &[u8]) {
@@ -79,16 +58,19 @@ fn main() -> io::Result<()> {
 
     // Image needs to be 240x320 (24bpp, no alpha channel)
     let src_image = load_png_image("assets/1.png");
-    let reduced_color_img = reduce_image_to_16bit_color(&src_image);
+    let mut reduced_color_img = reduce_image_to_16bit_color(&src_image);
+
+    let font_image = reduce_image_to_16bit_color(&load_font_png("assets/fonts/font1.png"));
 
     println!("Opening device...");
     let hid = HidApi::new().unwrap();
     let bitfenix_icon_device = hid.open(0x1fc9, 0x100b).unwrap();
 
-    let toggle_backlight_code: [u8; 2] = [0x0, 0x4];
-    bitfenix_icon_device.write(&toggle_backlight_code).unwrap();    
-
+    //let toggle_backlight_code: [u8; 2] = [0x0, 0x4];
+    //bitfenix_icon_device.write(&toggle_backlight_code).unwrap();    
     print_device_info(&bitfenix_icon_device);
+
+    render_string("Avishkar was here", 10, 20, &font_image, &mut reduced_color_img);
 
     println!("Writing new image...");
     clear_display(&bitfenix_icon_device); // needs to be done or you end up with weird overwriting on top of exiting image
