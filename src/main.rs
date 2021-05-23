@@ -69,7 +69,7 @@ fn main() -> io::Result<()> {
     print_device_info(&bitfenix_icon_device);
 
     let tr = TextRenderer::new();
-    tr.render_string("Avishkar was here", 10, 20, &font_image, &mut background_image);
+    tr.render_string("Hello world!", 10, 20, &font_image, &mut background_image);
 
     println!("Writing new image...");
     clear_display(&bitfenix_icon_device); // needs to be done or you end up with weird overwriting on top of exiting image
