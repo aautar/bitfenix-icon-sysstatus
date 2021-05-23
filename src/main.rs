@@ -6,8 +6,7 @@ mod image;
 use std::io::{self};
 use hidapi::HidApi;
 use hidapi::HidDevice;
-use text_renderer::render_string;
-use text_renderer::load_font_png;
+use text_renderer::TextRenderer;
 use image::load_png_image;
 use image::reduce_image_to_16bit_color;
 
@@ -56,11 +55,10 @@ fn main() -> io::Result<()> {
 
     println!("Loading assets...");
 
-    // Image needs to be 240x320 (24bpp, no alpha channel)
-    let src_image = load_png_image("assets/1.png");
-    let mut reduced_color_img = reduce_image_to_16bit_color(&src_image);
+    // Background image needs to be 240x320 (24bpp, no alpha channel)
+    let mut background_image = reduce_image_to_16bit_color(&load_png_image("assets/1.png"));
 
-    let font_image = reduce_image_to_16bit_color(&load_font_png("assets/fonts/font1.png"));
+    let font_image = reduce_image_to_16bit_color(&load_png_image("assets/fonts/font1.png"));
 
     println!("Opening device...");
     let hid = HidApi::new().unwrap();
@@ -70,11 +68,12 @@ fn main() -> io::Result<()> {
     //bitfenix_icon_device.write(&toggle_backlight_code).unwrap();    
     print_device_info(&bitfenix_icon_device);
 
-    render_string("Avishkar was here", 10, 20, &font_image, &mut reduced_color_img);
+    let tr = TextRenderer::new();
+    tr.render_string("Avishkar was here", 10, 20, &font_image, &mut background_image);
 
     println!("Writing new image...");
     clear_display(&bitfenix_icon_device); // needs to be done or you end up with weird overwriting on top of exiting image
-    write_image_to_display(&bitfenix_icon_device, &reduced_color_img);
+    write_image_to_display(&bitfenix_icon_device, &background_image);
 
     println!("Refreshing display...");
     refresh_display(&bitfenix_icon_device);
