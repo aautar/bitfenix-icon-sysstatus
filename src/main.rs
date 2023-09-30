@@ -1,7 +1,10 @@
 extern crate hidapi;
+extern crate reqwest;
+extern crate systemstat;
 
 mod text_renderer;
 mod image;
+mod web;
 
 use std::io::{self};
 use hidapi::HidApi;
@@ -51,7 +54,17 @@ fn write_image_to_display(bitfenix_icon_device: &HidDevice, image_buf: &[u8]) {
     }
 }
 
+fn get_hostname() -> String {
+    match hostname::get() {
+        Ok(hn) => hn.into_string().unwrap(),
+        Err(_) => String::from("Hostname unknown")
+    }
+}
+
 fn main() -> io::Result<()> {
+
+    println!("Hostname: {}", get_hostname());
+    web::http_get().unwrap();
 
     println!("Loading assets...");
 
