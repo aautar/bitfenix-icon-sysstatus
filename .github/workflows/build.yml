@@ -25,3 +25,9 @@ jobs:
 
     - name: Run tests
       run: cargo test --verbose
+
+    - name: Uploading debug executable artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: code-coverage-report
+        path: target/debug/bitfenix-icon-sysstatus
