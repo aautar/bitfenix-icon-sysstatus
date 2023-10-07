@@ -26,3 +26,18 @@ pub fn reduce_image_to_16bit_color(image_buf: &[u8]) -> Vec<u8> {
 
     result
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn reduce_image_to_16bit_color_returns_rgb565_pixel() {
+        let pixel32: [u8; 3] = [255, 0, 255];
+        let pixel16 = reduce_image_to_16bit_color(&pixel32);
+
+        assert_eq!(pixel16.len(), 2);
+        assert_eq!(pixel16[0], 0xf8);
+        assert_eq!(pixel16[1], 0x1f);
+    }
+}
