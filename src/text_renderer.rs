@@ -60,5 +60,5 @@ impl TextRenderer {
     
             cur_x = cur_x + (ch_width as u64);
         }
-    }
+    }    
 }
