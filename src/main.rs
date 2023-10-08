@@ -2,8 +2,10 @@ extern crate hidapi;
 
 mod text_renderer;
 mod image;
+mod web;
 
 use std::io::{self};
+use std::{thread, time::Duration};
 use hidapi::HidApi;
 use hidapi::HidDevice;
 use text_renderer::TextRenderer;
@@ -51,32 +53,48 @@ fn write_image_to_display(bitfenix_icon_device: &HidDevice, image_buf: &[u8]) {
     }
 }
 
+fn get_hostname() -> String {
+    match hostname::get() {
+        Ok(hn) => hn.into_string().unwrap(),
+        Err(_) => String::from("Hostname unknown")
+    }
+}
+
 fn main() -> io::Result<()> {
+    loop {
+        let hostname = get_hostname();
 
-    println!("Loading assets...");
+        println!("Loading assets...");
 
-    // Background image needs to be 240x320 (24bpp, no alpha channel)
-    let mut background_image = reduce_image_to_16bit_color(&load_png_image("assets/1.png"));
+        // Background image needs to be 240x320 (24bpp, no alpha channel)
+        let mut background_image = reduce_image_to_16bit_color(&load_png_image("assets/1.png"));
 
-    let font_image = reduce_image_to_16bit_color(&load_png_image("assets/fonts/font1.png"));
+        let font_image = reduce_image_to_16bit_color(&load_png_image("assets/fonts/font1.png"));
 
-    println!("Opening device...");
-    let hid = HidApi::new().unwrap();
-    let bitfenix_icon_device = hid.open(0x1fc9, 0x100b).unwrap();
+        println!("Opening device...");
+        let hid = HidApi::new().unwrap();
+        let bitfenix_icon_device = hid.open(0x1fc9, 0x100b).unwrap();
 
-    //let toggle_backlight_code: [u8; 2] = [0x0, 0x4];
-    //bitfenix_icon_device.write(&toggle_backlight_code).unwrap();    
-    print_device_info(&bitfenix_icon_device);
+        //let toggle_backlight_code: [u8; 2] = [0x0, 0x4];
+        //bitfenix_icon_device.write(&toggle_backlight_code).unwrap();
+        print_device_info(&bitfenix_icon_device);
 
-    let tr = TextRenderer::new();
-    tr.render_string("Hello world!", 10, 20, &font_image, &mut background_image);
+        let tr = TextRenderer::new();
+        tr.render_string("Hello world!", 10, 20, &font_image, &mut background_image);
 
-    println!("Writing new image...");
-    clear_display(&bitfenix_icon_device); // needs to be done or you end up with weird overwriting on top of exiting image
-    write_image_to_display(&bitfenix_icon_device, &background_image);
+        let hostname_print_out = ["Hostname: ", &hostname].concat();
+        tr.render_string(hostname_print_out.as_str(), 10, 20, &font_image, &mut background_image);
 
-    println!("Refreshing display...");
-    refresh_display(&bitfenix_icon_device);
+
+        println!("Writing new image...");
+        clear_display(&bitfenix_icon_device); // needs to be done or you end up with weird overwriting on top of exiting image
+        write_image_to_display(&bitfenix_icon_device, &background_image);
+
+        println!("Refreshing display...");
+        refresh_display(&bitfenix_icon_device);
+
+        thread::sleep(Duration::from_millis(300000));
+    }
 
     Ok(())
 }
