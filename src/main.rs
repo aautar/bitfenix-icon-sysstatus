@@ -81,7 +81,9 @@ fn main() -> io::Result<()> {
 
         let tr = TextRenderer::new();
         tr.render_string("Hello world!", 10, 20, &font_image, &mut background_image);
-        tr.render_string("Hostname: " + hostname, 10, 20, &font_image, &mut background_image);
+
+        let hostname_print_out = ["Hostname: ", hostname].concat();
+        tr.render_string(hostname_print_out.as_str(), 10, 20, &font_image, &mut background_image);
 
 
         println!("Writing new image...");
