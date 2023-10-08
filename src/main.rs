@@ -62,8 +62,7 @@ fn get_hostname() -> String {
 
 fn main() -> io::Result<()> {
     loop {
-        println!("Hostname: {}", get_hostname());
-        web::http_get().unwrap();
+        let hostname = get_hostname();
 
         println!("Loading assets...");
 
@@ -82,6 +81,8 @@ fn main() -> io::Result<()> {
 
         let tr = TextRenderer::new();
         tr.render_string("Hello world!", 10, 20, &font_image, &mut background_image);
+        tr.render_string("Hostname: " + hostname, 10, 20, &font_image, &mut background_image);
+
 
         println!("Writing new image...");
         clear_display(&bitfenix_icon_device); // needs to be done or you end up with weird overwriting on top of exiting image
