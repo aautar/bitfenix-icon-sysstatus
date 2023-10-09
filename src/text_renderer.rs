@@ -110,7 +110,7 @@ impl TextRenderer {
             let ch_y = ((ch_idx as f32 / 16.0) as u64) * 16;
 
             // For each character, copy the 16x16 block of pixels into outbuf
-            for fy in ch_y+15..(ch_y-1) {
+            for fy in ch_y..ch_y+16 {
                 for fx in ch_x..ch_x+16 {
                     let fidx: usize = ((fx + fy*256) * 2) as usize;
                     let fdx = fx - ch_x;
@@ -118,7 +118,7 @@ impl TextRenderer {
 
                     // write down, as we read across
                     let ox: u64 = (x + 15) - fdy;
-                    let oy: u64 = cur_y + fdx;
+                    let oy: u64 = (cur_y + 15) - fdx;
 
                     let outbuf_idx: usize = ((ox + (oy)*240) * 2) as usize;
 
