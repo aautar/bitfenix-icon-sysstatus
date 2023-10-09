@@ -98,8 +98,8 @@ impl TextRenderer {
         }
     }
 
-    // Render string along y-axis (rotated 90deg clockwise) and flipped
-    pub fn render_string_rot90cw_flipped(&self, txt: &str, x: u64, y: u64, fontimg: &[u8], outbuf: &mut [u8]) {
+    // Render string along y-axis (rotated 90deg counter-clockwise)
+    pub fn render_string_rot90ccw(&self, txt: &str, x: u64, y: u64, fontimg: &[u8], outbuf: &mut [u8]) {
         // x position of where character should be rendered
         let mut cur_y = y;
         for ch in txt.chars() {
@@ -117,8 +117,8 @@ impl TextRenderer {
                     let fdy = fy - ch_y;
 
                     // write down, as we read across
-                    let ox: u64 = (x + 15) - fdy;
-                    let oy: u64 = (cur_y + 15) - fdx;
+                    let ox: u64 = x + fdy;
+                    let oy: u64 = cur_y + fdx;
 
                     let outbuf_idx: usize = ((ox + (oy)*240) * 2) as usize;
 
