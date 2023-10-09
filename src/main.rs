@@ -67,7 +67,7 @@ fn main() -> io::Result<()> {
         println!("Loading assets...");
 
         // Background image needs to be 240x320 (24bpp, no alpha channel)
-        let mut background_image = reduce_image_to_16bit_color(&load_png_image("assets/1.png"));
+        let mut background_image = reduce_image_to_16bit_color(&load_png_image("assets/2.png"));
 
         let font_image = reduce_image_to_16bit_color(&load_png_image("assets/fonts/font1.png"));
 
@@ -80,10 +80,10 @@ fn main() -> io::Result<()> {
         print_device_info(&bitfenix_icon_device);
 
         let tr = TextRenderer::new();
-        tr.render_string("Hello world!", 10, 20, &font_image, &mut background_image);
+        tr.render_string_rot90cw("Hello world!", 10, 20, &font_image, &mut background_image);
 
         let hostname_print_out = ["Hostname: ", &hostname].concat();
-        tr.render_string(hostname_print_out.as_str(), 10, 20, &font_image, &mut background_image);
+        tr.render_string(hostname_print_out.as_str(), 100, 50, &font_image, &mut background_image);
 
 
         println!("Writing new image...");
