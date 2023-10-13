@@ -63,6 +63,8 @@ fn get_hostname() -> String {
 fn main() -> io::Result<()> {
     loop {
         let hostname = get_hostname();
+        let hostname_print_out = ["Host: ", &hostname].concat();
+        let web_connect_status = ["Internet: ", &web::http_get()].concat();
 
         println!("Loading assets...");
 
@@ -80,11 +82,8 @@ fn main() -> io::Result<()> {
         print_device_info(&bitfenix_icon_device);
 
         let tr = TextRenderer::new();
-        tr.render_string_rot90ccw("Hello world!", 50, 120, &font_image, &mut background_image);
-
-        let hostname_print_out = ["Hostname: ", &hostname].concat();
-        tr.render_string(hostname_print_out.as_str(), 100, 50, &font_image, &mut background_image);
-
+        tr.render_string_rot90ccw(hostname_print_out.as_str(), 10, 300, &font_image, &mut background_image);
+        tr.render_string_rot90ccw(web_connect_status.as_str(), 25, 300, &font_image, &mut background_image);
 
         println!("Writing new image...");
         clear_display(&bitfenix_icon_device); // needs to be done or you end up with weird overwriting on top of exiting image
