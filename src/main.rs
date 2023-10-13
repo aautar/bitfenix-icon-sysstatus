@@ -80,7 +80,7 @@ fn main() -> io::Result<()> {
         print_device_info(&bitfenix_icon_device);
 
         let tr = TextRenderer::new();
-        tr.render_string_rot90ccw("Hello world!", 10, 20, &font_image, &mut background_image);
+        tr.render_string_rot90ccw("Hello world!", 50, 120, &font_image, &mut background_image);
 
         let hostname_print_out = ["Hostname: ", &hostname].concat();
         tr.render_string(hostname_print_out.as_str(), 100, 50, &font_image, &mut background_image);

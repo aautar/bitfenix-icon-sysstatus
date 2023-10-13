@@ -130,7 +130,7 @@ impl TextRenderer {
                 }
             }
 
-            cur_y = cur_y + (ch_width as u64);
+            cur_y = cur_y - (ch_width as u64);
         }
     }
 
