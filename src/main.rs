@@ -3,6 +3,7 @@ extern crate hidapi;
 mod text_renderer;
 mod image;
 mod web;
+mod stats;
 
 use std::io::{self};
 use std::{thread, time::Duration};
@@ -62,9 +63,21 @@ fn get_hostname() -> String {
 
 fn main() -> io::Result<()> {
     loop {
+        // Hostname
         let hostname = get_hostname();
         let hostname_print_out = ["Host: ", &hostname].concat();
-        let web_connect_status = ["Internet: ", &web::http_get()].concat();
+
+        // Web connection status
+        let web_connect_status = web::http_get();
+        let mut web_connect_display = "FAIL";
+        if web_connect_status == "200" {
+            web_connect_display = "OK";
+        }
+
+        let web_connect_status = ["Internet: ", web_connect_display].concat();
+
+        // CPU temp
+        stats::query_cpu_temp();
 
         println!("Loading assets...");
 

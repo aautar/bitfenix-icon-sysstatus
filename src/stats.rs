@@ -1,6 +1,6 @@
 use std::thread;
 use std::time::Duration;
-use systemstat::{System, Platform, saturating_sub_bytes};
+use systemstat::System;
 
 pub fn query_cpu_temp() 
 {
