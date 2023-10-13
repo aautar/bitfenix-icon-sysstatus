@@ -116,9 +116,9 @@ impl TextRenderer {
                     let fdx = fx - ch_x;
                     let fdy = fy - ch_y;
 
-                    // write down, as we read across
+                    // write down to up, left to right, as we read across
                     let ox: u64 = x + fdy;
-                    let oy: u64 = cur_y + fdx;
+                    let oy: u64 = (cur_y + 15) - fdx;
 
                     let outbuf_idx: usize = ((ox + (oy)*240) * 2) as usize;
 
@@ -193,7 +193,7 @@ mod tests {
     }
 
     #[test]
-    fn render_string_rot90_renders_font_character_correctly() {
+    fn render_string_rot90cw_renders_font_character_correctly() {
         let font = gen_test_font();
         
         let mut background: Vec<u8> = Vec::with_capacity(240 * 320 * 2);
@@ -220,7 +220,39 @@ mod tests {
         // (offset from left becomes offset from top, offset from top becomes offset from right)
         let idx_char_center = (((render_x+(15-9)) + (render_y+4)*240) * 2) as usize;
         assert_eq!(background[idx_char_center], 255);
-        assert_eq!(background[idx_char_center+1], 255);        
+        assert_eq!(background[idx_char_center+1], 255);
+    }
+
+    #[test]
+    fn render_string_rot90ccw_renders_font_character_correctly() {
+        let font = gen_test_font();
+        
+        let mut background: Vec<u8> = Vec::with_capacity(240 * 320 * 2);
+        for _ in 0..((240 * 320 * 2)) {
+            background.push(0);
+        }
+
+        let tr = TextRenderer::new();
+        let render_x = 10;
+        let render_y = 5;
+        tr.render_string_rot90ccw("A", render_x, render_y, &font, &mut background);
+
+        // check bottom-left pixel of character in output (this is the top-left pixel in non-rotated output)
+        let idx_char_tl = ((render_x + (render_y+15) *240) * 2) as usize;
+        assert_eq!(background[idx_char_tl], 255);
+        assert_eq!(background[idx_char_tl+1], 255);
+
+        // check top-left pixel of character in output (this is the top-right pixel in non-rotated output)
+        let idx_char_tr = ((render_x + render_y*240) * 2) as usize;
+        assert_eq!(background[idx_char_tr], 255);
+        assert_eq!(background[idx_char_tr+1], 255);
+
+
+        // check close-to-center pixel of character in output
+        // (offset from left becomes offset from top, offset from top becomes offset from right)
+        let idx_char_center = (((render_x+9) + ((render_y+15)-4)*240) * 2) as usize;
+        assert_eq!(background[idx_char_center], 255);
+        assert_eq!(background[idx_char_center+1], 255);
     }
 
 }
