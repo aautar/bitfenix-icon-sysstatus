@@ -63,6 +63,8 @@ fn get_hostname() -> String {
 
 fn main() -> io::Result<()> {
     loop {
+        // Refresh time
+
         // Hostname
         let hostname = get_hostname();
         let hostname_print_out = ["Host: ", &hostname].concat();
