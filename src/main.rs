@@ -3,10 +3,9 @@ extern crate hidapi;
 mod text_renderer;
 mod image;
 mod web;
-mod stats;
 
 use std::io::{self};
-use std::{thread, time::Duration};
+use std::{thread, time::Duration, time::SystemTime};
 use hidapi::HidApi;
 use hidapi::HidDevice;
 use text_renderer::TextRenderer;
@@ -64,6 +63,10 @@ fn get_hostname() -> String {
 fn main() -> io::Result<()> {
     loop {
         // Refresh time
+        let refresh_start_time = chrono::Local::now();
+        let refresh_start_time_str = refresh_start_time.to_rfc2822();
+        
+        let refresh_start_time_display = ["Last refresh: ", &refresh_start_time_str].concat();
 
         // Hostname
         let hostname = get_hostname();
@@ -79,7 +82,6 @@ fn main() -> io::Result<()> {
         let web_connect_status = ["Internet: ", web_connect_display].concat();
 
         // CPU temp
-        stats::query_cpu_temp();
 
         println!("Loading assets...");
 
@@ -97,8 +99,9 @@ fn main() -> io::Result<()> {
         print_device_info(&bitfenix_icon_device);
 
         let tr = TextRenderer::new();
-        tr.render_string_rot90ccw(hostname_print_out.as_str(), 10, 300, &font_image, &mut background_image);
-        tr.render_string_rot90ccw(web_connect_status.as_str(), 25, 300, &font_image, &mut background_image);
+        tr.render_string_rot90ccw(refresh_start_time_display.as_str(), 10, 300, &font_image, &mut background_image);
+        tr.render_string_rot90ccw(hostname_print_out.as_str(), 25, 300, &font_image, &mut background_image);
+        tr.render_string_rot90ccw(web_connect_status.as_str(), 40, 300, &font_image, &mut background_image);
 
         println!("Writing new image...");
         clear_display(&bitfenix_icon_device); // needs to be done or you end up with weird overwriting on top of exiting image
