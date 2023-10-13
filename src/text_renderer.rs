@@ -94,7 +94,7 @@ impl TextRenderer {
                 }
             }
     
-            cur_y = cur_y + (ch_width as u64);
+            cur_y = cur_y - (ch_width as u64);
         }
     }
 
@@ -130,7 +130,7 @@ impl TextRenderer {
                 }
             }
 
-            cur_y = cur_y - (ch_width as u64);
+            cur_y = cur_y + (ch_width as u64);
         }
     }
 
@@ -234,7 +234,7 @@ mod tests {
 
         let tr = TextRenderer::new();
         let render_x = 10;
-        let render_y = 5;
+        let render_y = 50;
         tr.render_string_rot90ccw("A", render_x, render_y, &font, &mut background);
 
         // check bottom-left pixel of character in output (this is the top-left pixel in non-rotated output)
