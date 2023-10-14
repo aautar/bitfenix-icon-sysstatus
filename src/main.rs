@@ -11,6 +11,8 @@ use hidapi::HidDevice;
 use text_renderer::TextRenderer;
 use image::load_png_image;
 use image::reduce_image_to_16bit_color;
+use std::process::Command;
+
 
 fn print_device_info(bitfenix_icon_device: &HidDevice) {
     let device_manuf_string = bitfenix_icon_device.get_manufacturer_string().unwrap().unwrap();    
@@ -60,6 +62,11 @@ fn get_hostname() -> String {
     }
 }
 
+fn get_host_ip_address() -> String {
+    let hostname_out = Command::new("/bin/hostname").arg("-I").output().expect("failed to execute process");
+    String::from_utf8_lossy(&hostname_out.stdout).to_string()
+}
+
 fn main() -> io::Result<()> {
     loop {
         // Refresh time
@@ -71,6 +78,10 @@ fn main() -> io::Result<()> {
         // Hostname
         let hostname = get_hostname();
         let hostname_print_out = ["Host: ", &hostname].concat();
+
+        // Host IP
+        let host_ip = get_host_ip_address();
+        let host_ip_print_out = ["Host IP: ", &host_ip].concat();
 
         // Web connection status
         let web_connect_status = web::http_get();
@@ -101,7 +112,8 @@ fn main() -> io::Result<()> {
         let tr = TextRenderer::new();
         tr.render_string_rot90ccw(refresh_start_time_display.as_str(), 10, 300, &font_image, &mut background_image);
         tr.render_string_rot90ccw(hostname_print_out.as_str(), 25, 300, &font_image, &mut background_image);
-        tr.render_string_rot90ccw(web_connect_status.as_str(), 40, 300, &font_image, &mut background_image);
+        tr.render_string_rot90ccw(host_ip_print_out.as_str(), 40, 300, &font_image, &mut background_image);
+        tr.render_string_rot90ccw(web_connect_status.as_str(), 55, 300, &font_image, &mut background_image);
 
         println!("Writing new image...");
         clear_display(&bitfenix_icon_device); // needs to be done or you end up with weird overwriting on top of exiting image
